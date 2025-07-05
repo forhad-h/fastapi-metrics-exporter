@@ -1,0 +1,21 @@
+services:
+  fastapi:
+    build: .
+    container_name: fastapi-server
+    ports:
+      - "8000:8000"
+    networks:
+      - fastapi-metrics-net
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-server
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - fastapi-metrics-net
+
+networks:
+  fastapi-metrics-net:
