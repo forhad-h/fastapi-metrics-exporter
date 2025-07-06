@@ -21,11 +21,3 @@ class MetricsMiddleware(BaseHTTPMiddleware):
         record_request(method, endpoint, status_code, process_time)
 
         return response
-
-
-def setup_metrics_middleware(app):
-    app.add_middleware(MetricsMiddleware)
-
-    @app.get("/metrics")
-    async def metrics():
-        return Response(content=generate_latest(), media_type="text/plain")

@@ -1,5 +1,6 @@
-import psutil
+import time
 import gc
+import psutil
 from prometheus_client import Gauge, REGISTRY
 
 
@@ -69,7 +70,8 @@ def collect_system_metrics():
     THREAD_COUNT.set(PROCESS.num_threads())
 
     PROCESS_START_TIME.set(PROCESS.create_time())
-    PROCESS_UPTIME.set(PROCESS.time() - PROCESS.create_time())
+
+    PROCESS_UPTIME.set(time.time() - PROCESS.create_time())
 
     gc_stats = gc.get_count()
     for i, count in enumerate(gc_stats):
