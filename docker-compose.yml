@@ -21,5 +21,21 @@ services:
     networks:
       - fastapi-metrics-net
 
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-server
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=12345678
+    networks:
+      - fastapi-metrics-net
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
 networks:
   fastapi-metrics-net:
+
+volumes:
+  grafana-storage:
