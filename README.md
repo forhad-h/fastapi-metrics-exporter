@@ -8,9 +8,9 @@ This project is a production-ready FastAPI application that provides comprehensi
 
 ## Quick Start: Running the Stack and Visualizing Metrics
 
-> **Notice:**
+
+> **Prerequisites: Docker & Compose**
 >
-> This project requires:
 > - **Docker:** 20.10.0 or newer (tested with 28.3.1)
 > - **Docker Compose:** V2 plugin (use `docker compose` command), 2.0.0 or newer (tested with v2.38.1)
 >   - Compose V2 is included with Docker Engine 20.10+ and is recommended over the legacy `docker-compose` command.
@@ -40,9 +40,11 @@ This will start the FastAPI app, Prometheus, and Grafana.
 3. Go to **Dashboards → Import**, upload `monitoring/dashboards/fastapi-metrics.json`.
 4. The dashboard will visualize FastAPI and system metrics in real time.
 
-#### Connecting Grafana to Prometheus
-- In Grafana, navigate to **Configuration → Data Sources → Add data source → Prometheus**.
-- Set the URL to `http://prometheus:9090` and save.
+
+> **Connecting Grafana to Prometheus:**
+>
+> - In Grafana, navigate to **Connections → Data Sources → Add data source → Prometheus**.
+> - Set the URL to `http://prometheus:9090` and save.
 
 ---
 
@@ -96,7 +98,9 @@ All metrics are exposed at `/metrics` in Prometheus format.
 - **Grafana:**
   - Import dashboards from `monitoring/dashboards/fastapi-metrics.json`.
 - **Application:**
-  - Main settings in `app/main.py` and `app/config.py`.
+  - Set the metrics collection interval using the `METRICS_COLLECTION_INTERVAL` environment variable (in your environment or in `docker-compose.yml`).
+  - Adjust how often Prometheus scrapes metrics by editing the `scrape_interval` in `prometheus/prometheus.yml`.
+  - Grafana admin credentials can be configured via the `GF_SECURITY_ADMIN_USER` and `GF_SECURITY_ADMIN_PASSWORD` environment variables in `docker-compose.yml`.
   - To change the metrics endpoint, update the relevant route in the code.
   - Metric collection intervals and histogram buckets can be customized in the metrics modules.
 
