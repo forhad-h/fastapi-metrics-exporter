@@ -1,9 +1,12 @@
 services:
   fastapi:
     build: .
-    container_name: fastapi-server
+    image: fastapi-server-image:latest
+    container_name: fastapi-server-container
     ports:
       - "8000:8000"
+    environment:
+      - METRIC_COLLECTION_INTERVAL=5
     networks:
       - fastapi-metrics-net
 

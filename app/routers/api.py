@@ -1,11 +1,18 @@
 from fastapi import APIRouter
 from prometheus_client import Counter
+from pydantic import BaseModel
+
 
 router = APIRouter()
 
 data_post_counter = Counter("data_post_requests_total", "Total POST /data requests")
 
 data_store = []
+
+
+class DataItem(BaseModel):
+    name: str
+    value: int
 
 
 @router.post("/")

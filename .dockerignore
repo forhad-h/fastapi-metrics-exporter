@@ -1,39 +1,53 @@
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.db
-*.sqlite3
-*.log
-*.pot
-*.mo
-*.env
-.env.*
-venv/
-ENV/
-env/
-.venv/
-.idea/
-.vscode/
-.git/
+# Git
+.git
 .gitignore
-.DS_Store
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
 *.egg-info/
 dist/
 build/
-*.egg
-*.bak
-*.swp
-*.tmp
-*.out
-coverage/
-htmlcov/
-.tox/
-.mypy_cache/
+eggs/
+parts/
+bin/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
 .pytest_cache/
-.cache/
-node_modules/
+.coverage
+htmlcov/
 
-# Docker specific
-Dockerfile*
-docker-compose*
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker
+Dockerfile
+docker-compose*.yml
+
+# Logs
+*.log
+logs/
+
+# Local development
+*.sqlite
+*.db
+.DS_Store

@@ -1,22 +1,25 @@
+import time
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
-from promethues_client import Counter, Histogram, generate_latest
-
-REQUEST_COUNT = Counter(
-    "http_requests_total", "Total HTTP requests", ["method", "endpoint"]
-)
-REQUEST_LATENCY = Histogram(
-    "http_request_duration_seconds", "Request Latency", ["endpoint"]
-)
+from prometheus_client import generate_latest
+from app.metrics.http_metrics import record_request
 
 
 class MetricsMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        start_time = time.time()
+        response = await call_next(request)
+        process_time = time.time() - start_time
+
+        method = request.method
+        endpoint = request.url.path
+        status_code = response.status_code
+
         endpoint = request.url.path
         method = request.method
-        with REQUEST_LATENCY.labels(endpoint=endpoint).time():
-            response = await call_next(request)
-        REQUEST_COUNT.labels(method=method, endpoint=endpoint).inc()
+
+        record_request(method, endpoint, status_code, process_time)
+
         return response
 
 
@@ -25,4 +28,4 @@ def setup_metrics_middleware(app):
 
     @app.get("/metrics")
     async def metrics():
-        return Response(contenct=generate_latest(), media_type="text/plain")
+        return Response(content=generate_latest(), media_type="text/plain")
