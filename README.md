@@ -6,6 +6,9 @@ This project is a production-ready FastAPI application that provides comprehensi
 
 ---
 
+## Architecture
+![Diagram](https://user-images.githubusercontent.com/your-image-id.png)
+
 ## Quick Start: Running the Stack and Visualizing Metrics
 
 
