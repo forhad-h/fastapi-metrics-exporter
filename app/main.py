@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 import asyncio
 from fastapi import FastAPI
 from app.middleware.metrics_middleware import MetricsMiddleware
-from app.routers import api, health
+from app.routers import api, health, test
 from app.metrics import system_metrics
 from app.metrics.routes import router as metrics_router
 from app.config import METRICS_COLLECTION_INTERVAL
@@ -15,8 +15,15 @@ print("⚡ Waiting for debugger attach...")
 # region: Metrics Collection
 async def periodic_collection(interval: int = 10):
     while True:
-        system_metrics.collect_system_metrics()
-        await asyncio.sleep(interval)
+        try:
+            print("BG Task: Collecting system metrics...")
+            system_metrics.collect_system_metrics()
+            print("BG Task: System metrics collected successfully.")
+        except Exception as e:
+            print(f"Error collecting system metrics: {e}")
+        finally:
+            print("BG Task: Metrics collected, sleeping for interval...")
+            await asyncio.sleep(interval)
 
 
 @asynccontextmanager
@@ -38,6 +45,7 @@ app.add_middleware(MetricsMiddleware)
 app.include_router(metrics_router, prefix="/metrics", tags=["metrics"])
 app.include_router(health.router, prefix="/health", tags=["health"])
 app.include_router(api.router, prefix="/data", tags=["data"])
+app.include_router(test.router, prefix="/test", tags=["test"])
 
 
 @app.get("/")

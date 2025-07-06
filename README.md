@@ -1,61 +1,96 @@
-# FastAPI Metrics Exporter
+# FastAPI Metrics Monitoring System
 
 ## Overview
-This project is a FastAPI application that provides comprehensive metrics monitoring capabilities. It exposes application and system metrics in a format compatible with Prometheus scraping.
+
+This project is a production-ready FastAPI application that provides comprehensive system-level and application-level metrics monitoring. It exposes detailed performance metrics in Prometheus format, enabling real-time observability of both infrastructure health and application behavior. The stack includes Prometheus for metrics storage and querying, and Grafana for advanced dashboard visualization.
+
+---
+
+## Quick Start: Running the Stack and Visualizing Metrics
+
+### 1. Clone and Start the Project
+
+```bash
+git clone https://github.com/forhad-h/fastapi-metrics-exporter
+cd fastapi-metrics-exporter
+docker-compose up --build
+```
+
+This will start the FastAPI app, Prometheus, and Grafana.
+
+### 2. Access the Services
+
+- **FastAPI app:** [http://localhost:8000](http://localhost:8000)
+- **Metrics endpoint:** [http://localhost:8000/metrics](http://localhost:8000/metrics)
+- **Prometheus:** [http://localhost:9090](http://localhost:9090)
+- **Grafana:** [http://localhost:3000](http://localhost:3000) (default login: `admin` / `admin`)
+
+### 3. Import the Grafana Dashboard
+
+1. Log in to Grafana at [http://localhost:3000](http://localhost:3000).
+2. Add Prometheus as a data source (URL: `http://prometheus:9090`).
+3. Go to **Dashboards → Import**, upload `monitoring/dashboards/fastapi-metrics.json`.
+4. The dashboard will visualize FastAPI and system metrics in real time.
+
+#### Connecting Grafana to Prometheus
+- In Grafana, navigate to **Configuration → Data Sources → Add data source → Prometheus**.
+- Set the URL to `http://prometheus:9090` and save.
+
+---
+
+## API Endpoints and Stress Test Utilities
+
+The application provides several endpoints for monitoring and testing:
+
+- `GET /` — Root endpoint
+- `GET /health` — Health check
+- `GET /metrics` — Prometheus metrics exposition
+- `POST /data` — Sample data processing
+- `GET /data` — Sample data retrieval
+- `GET /stress/cpu` — **CPU stress test** (simulates CPU load)
+- `GET /stress/memory` — **Memory stress test** (simulates memory usage)
+
+You can use the `/stress/cpu` and `/stress/memory` endpoints to generate artificial load and observe the effect on system metrics in real time via Grafana or Prometheus.
+
+---
+
+## Why Use `prometheus_client` Instead of `prometheus_fastapi_instrumentator`?
+
+This project uses the low-level [`prometheus_client`](https://github.com/prometheus/client_python) library to implement metrics collection and exposition. This approach is chosen to provide a deeper understanding of Prometheus metrics, custom metric creation, and manual instrumentation. 
+
+**Note:** For production deployments where rapid setup and best practices are desired, [`prometheus_fastapi_instrumentator`](https://github.com/trallard/prometheus-fastapi-instrumentator) is recommended. It offers automatic instrumentation and is easier to integrate, but using `prometheus_client` directly is valuable for learning and for advanced customization.
 
 ---
 
 ## Metrics Reference Guide
 
-The application exposes the following types of metrics:
-
 ### HTTP Metrics
-- **Request Count**: Number of HTTP requests received, labeled by method, endpoint, and status code.
-- **Request Latency**: Histogram of request processing time in seconds.
-- **Request Size**: Size of incoming requests (if implemented).
-- **Response Size**: Size of outgoing responses (if implemented).
+- **http_requests_total**: Counter for total HTTP requests, labeled by method, endpoint, and status code.
+- **http_request_duration_seconds**: Histogram of request processing time in seconds.
+- **Request/Response Size**: Histograms for request and response sizes (if implemented).
 
 ### System Metrics
-- **CPU Usage**: Current CPU usage percentage.
-- **Memory Usage**: Current memory usage in bytes and percentage.
-- **Disk Usage**: Disk space used and available.
+- **process_cpu_seconds_total**: Total CPU time consumed by the process.
+- **CPU Usage Rate**: `rate(process_cpu_seconds_total[5m])` for CPU usage trends.
+- **process_resident_memory_bytes**: Physical memory used.
+- **process_virtual_memory_bytes**: Virtual memory allocated.
 - **Uptime**: Application uptime in seconds.
+- **File Descriptor Usage, GC Stats, Thread Count**: Additional process-level metrics.
 
-All metrics are exposed at the `/metrics` endpoint in Prometheus format.
-
----
-
-## Deployment Instructions (Docker Compose)
-
-1. **Clone the repository:**
-   ```bash
-   git clone <your-repo-url>
-   cd fastapi-metrics-exporter
-   ```
-
-2. **Start the application and Prometheus:**
-   ```bash
-   docker-compose up --build
-   ```
-
-3. **Access the services:**
-   - FastAPI app: [http://localhost:8000](http://localhost:8000)
-   - Metrics endpoint: [http://localhost:8000/metrics](http://localhost:8000/metrics)
-   - Prometheus: [http://localhost:9090](http://localhost:9090)
+All metrics are exposed at `/metrics` in Prometheus format.
 
 ---
 
 ## Configuration Options
 
-The following configuration options are available:
-
-- **Prometheus Configuration:**
-  - The Prometheus server is configured via `prometheus/prometheus.yml`.
-  - You can modify scrape intervals, targets, and other Prometheus settings in this file.
-
-- **Application Settings:**
-  - Default FastAPI settings can be adjusted in `app/main.py`.
+- **Prometheus:**
+  - Configured via `prometheus/prometheus.yml` (edit scrape intervals, targets, etc.).
+- **Grafana:**
+  - Import dashboards from `monitoring/dashboards/fastapi-metrics.json`.
+- **Application:**
+  - Main settings in `app/main.py` and `app/config.py`.
   - To change the metrics endpoint, update the relevant route in the code.
+  - Metric collection intervals and histogram buckets can be customized in the metrics modules.
 
 ---
 
@@ -64,11 +99,22 @@ The following configuration options are available:
 ```
 app/
   main.py                # FastAPI app entry point
+  config.py              # App configuration
   metrics/               # Metrics collection modules
+    system_metrics.py    # System metrics (CPU, memory, etc.)
+    http_metrics.py      # HTTP request metrics
+    routes.py            # Metrics routes
   middleware/            # Middleware for metrics
+    metrics_middleware.py
   routers/               # API and health endpoints
+    api.py
+    health.py
+    test.py
 prometheus/
   prometheus.yml         # Prometheus configuration
+monitoring/
+  dashboards/
+    fastapi-metrics.json # Grafana dashboard
 docker-compose.yml       # Multi-service orchestration
 Dockerfile               # App container definition
 requirements.txt         # Python dependencies
