@@ -8,12 +8,20 @@ This project is a production-ready FastAPI application that provides comprehensi
 
 ## Quick Start: Running the Stack and Visualizing Metrics
 
+> **Notice:**
+>
+> This project requires:
+> - **Docker:** 20.10.0 or newer (tested with 28.3.1)
+> - **Docker Compose:** V2 plugin (use `docker compose` command), 2.0.0 or newer (tested with v2.38.1)
+>   - Compose V2 is included with Docker Engine 20.10+ and is recommended over the legacy `docker-compose` command.
+
+
 ### 1. Clone and Start the Project
 
 ```bash
 git clone https://github.com/forhad-h/fastapi-metrics-exporter
 cd fastapi-metrics-exporter
-docker-compose up --build
+docker compose up --build
 ```
 
 This will start the FastAPI app, Prometheus, and Grafana.
